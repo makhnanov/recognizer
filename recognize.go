@@ -334,10 +334,10 @@ loop:
 					}
 				}
 			}
-			if ev.Kind == hook.KeyDown && ev.Keycode == 1 { // Esc
-				fmt.Println("Выход")
-				break loop
-			}
+			//if ev.Kind == hook.KeyDown && ev.Keycode == 1 { // Esc
+			//	fmt.Println("Выход")
+			//	break loop
+			//}
 		case <-sigs:
 			break loop
 		}
