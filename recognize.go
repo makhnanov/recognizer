@@ -207,12 +207,15 @@ func transcribeAudio(filename string) (string, error) {
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
 	// Отправляем запрос
+	fmt.Printf("[%s] 🔄 Отправка запроса в Whisper API...\n", time.Now().Format("15:04:05"))
 	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("failed to send request: %v", err)
 	}
 	defer resp.Body.Close()
+
+	fmt.Printf("[%s] ✓ Получен ответ от Whisper API (HTTP %d)\n", time.Now().Format("15:04:05"), resp.StatusCode)
 
 	// Читаем ответ
 	body, err := io.ReadAll(resp.Body)
@@ -294,7 +297,6 @@ func main() {
 	evChan := hook.Start()
 	defer hook.End()
 
-	fmt.Printf("🖱️ DEBUG: MouseMap = %+v\n", hook.MouseMap)
 	fmt.Println("Управление: зажать F9 или среднюю кнопку мыши (>0.5с) = запись, отпустить = стоп.")
 	fmt.Println("После записи аудио будет автоматически распознано с помощью Whisper API.")
 
@@ -310,11 +312,10 @@ loop:
 			if middleButtonPressed && !middleButtonRecordingStarted {
 				pressDuration := time.Since(middleButtonPressTime)
 				if pressDuration >= 500*time.Millisecond {
-					fmt.Println("🖱️ DEBUG: 0.5s elapsed, starting recording")
 					middleButtonRecordingStarted = true
 					timestamp := time.Now().Format("2006-01-02_15-04-05")
 					currentFilename = fmt.Sprintf(".voices/voice_recording_%s.wav", timestamp)
-					fmt.Println("▶️ Старт записи (средняя кнопка мыши):", currentFilename)
+					fmt.Printf("[%s] ▶️ Старт записи: %s\n", time.Now().Format("15:04:05"), currentFilename)
 					if err := recorder.StartRecording(currentFilename); err != nil {
 						fmt.Println("Ошибка:", err)
 					}
@@ -322,18 +323,13 @@ loop:
 			}
 
 		case ev := <-evChan:
-			// Отладка: выводим информацию о событиях мыши
-			if ev.Kind == hook.MouseDown || ev.Kind == hook.MouseUp {
-				fmt.Printf("🖱️ DEBUG: Mouse event - Kind: %d, Button: %d, X: %d, Y: %d\n",
-					ev.Kind, ev.Button, ev.X, ev.Y)
-			}
 
 			// Отслеживаем нажатие F9 (Rawcode 65478)
 			if ev.Kind == hook.KeyDown && ev.Rawcode == 65478 { // F9
 				if !recorder.recording {
 					timestamp := time.Now().Format("2006-01-02_15-04-05")
 					currentFilename = fmt.Sprintf(".voices/voice_recording_%s.wav", timestamp)
-					fmt.Println("▶️ Старт записи:", currentFilename)
+					fmt.Printf("[%s] ▶️ Старт записи: %s\n", time.Now().Format("15:04:05"), currentFilename)
 					if err := recorder.StartRecording(currentFilename); err != nil {
 						fmt.Println("Ошибка:", err)
 					}
@@ -341,24 +337,20 @@ loop:
 			}
 			if ev.Kind == hook.KeyUp && ev.Rawcode == 65478 { // F9
 				if recorder.recording {
-					fmt.Println("⏹ Стоп записи")
+					fmt.Printf("[%s] ⏹ Стоп записи\n", time.Now().Format("15:04:05"))
 					if err := recorder.StopRecording(); err != nil {
 						fmt.Println("Ошибка:", err)
 					} else if currentFilename != "" {
 						// Распознаем речь
-						fmt.Println("🔄 Распознавание речи...")
 						text, err := transcribeAudio(currentFilename)
 						if err != nil {
 							fmt.Printf("❌ Ошибка распознавания: %v\n", err)
 						} else {
-							fmt.Printf("📝 Распознанный текст: \"%s\"\n", text)
+							fmt.Printf("[%s] 📝 %s\n", time.Now().Format("15:04:05"), text)
 
 							// Копируем в буфер обмена и вставляем в позицию курсора
-							fmt.Println("📋 Копирование в буфер обмена и вставка...")
 							if copyErr := copyToClipboardAndPaste(text); copyErr != nil {
 								fmt.Printf("❌ Ошибка копирования/вставки: %v\n", copyErr)
-							} else {
-								fmt.Println("✅ Текст скопирован и вставлен!")
 							}
 						}
 					}
@@ -367,7 +359,6 @@ loop:
 
 			// Отслеживаем нажатие средней кнопки мыши (Button 2)
 			if ev.Kind == hook.MouseDown && ev.Button == 2 {
-				fmt.Printf("🖱️ DEBUG: Middle button PRESSED (Button = %d)\n", ev.Button)
 				middleButtonPressed = true
 				middleButtonRecordingStarted = false
 				middleButtonPressTime = time.Now()
@@ -375,28 +366,22 @@ loop:
 
 			// Отслеживаем отпускание средней кнопки мыши (Button 2)
 			if ev.Kind == hook.MouseUp && ev.Button == 2 {
-				fmt.Printf("🖱️ DEBUG: Middle button RELEASED (Button = %d)\n", ev.Button)
-
 				// Если запись была начата средней кнопкой, останавливаем её
 				if middleButtonPressed && middleButtonRecordingStarted && recorder.recording {
-					fmt.Println("⏹ Стоп записи (средняя кнопка мыши)")
+					fmt.Printf("[%s] ⏹ Стоп записи\n", time.Now().Format("15:04:05"))
 					if err := recorder.StopRecording(); err != nil {
 						fmt.Println("Ошибка:", err)
 					} else if currentFilename != "" {
 						// Распознаем речь
-						fmt.Println("🔄 Распознавание речи...")
 						text, err := transcribeAudio(currentFilename)
 						if err != nil {
 							fmt.Printf("❌ Ошибка распознавания: %v\n", err)
 						} else {
-							fmt.Printf("📝 Распознанный текст: \"%s\"\n", text)
+							fmt.Printf("[%s] 📝 %s\n", time.Now().Format("15:04:05"), text)
 
 							// Копируем в буфер обмена и вставляем в позицию курсора
-							fmt.Println("📋 Копирование в буфер обмена и вставка...")
 							if copyErr := copyToClipboardAndPaste(text); copyErr != nil {
 								fmt.Printf("❌ Ошибка копирования/вставки: %v\n", copyErr)
-							} else {
-								fmt.Println("✅ Текст скопирован и вставлен!")
 							}
 						}
 					}
