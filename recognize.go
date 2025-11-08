@@ -287,7 +287,6 @@ func main() {
 
 	recorder := NewAudioRecorder()
 	var currentFilename string
-	var middleButtonPressTime time.Time
 	var middleButtonPressed bool
 	var middleButtonRecordingStarted bool
 
@@ -309,18 +308,18 @@ loop:
 		select {
 		case <-checkMiddleButtonTicker.C:
 			// Проверяем, зажата ли средняя кнопка более 0.5 секунды
-			if middleButtonPressed && !middleButtonRecordingStarted {
-				pressDuration := time.Since(middleButtonPressTime)
-				if pressDuration >= 500*time.Millisecond {
-					middleButtonRecordingStarted = true
-					timestamp := time.Now().Format("2006-01-02_15-04-05")
-					currentFilename = fmt.Sprintf(".voices/voice_recording_%s.wav", timestamp)
-					fmt.Printf("[%s] ▶️ Старт записи: %s\n", time.Now().Format("15:04:05"), currentFilename)
-					if err := recorder.StartRecording(currentFilename); err != nil {
-						fmt.Println("Ошибка:", err)
-					}
-				}
-			}
+			//if middleButtonPressed && !middleButtonRecordingStarted {
+			//	pressDuration := time.Since(middleButtonPressTime)
+			//	if pressDuration >= 500*time.Millisecond {
+			//		middleButtonRecordingStarted = true
+			//		timestamp := time.Now().Format("2006-01-02_15-04-05")
+			//		currentFilename = fmt.Sprintf(".voices/voice_recording_%s.wav", timestamp)
+			//		fmt.Printf("[%s] ▶️ Старт записи: %s\n", time.Now().Format("15:04:05"), currentFilename)
+			//		if err := recorder.StartRecording(currentFilename); err != nil {
+			//			fmt.Println("Ошибка:", err)
+			//		}
+			//	}
+			//}
 
 		case ev := <-evChan:
 
@@ -348,6 +347,13 @@ loop:
 						} else {
 							fmt.Printf("[%s] 📝 %s\n", time.Now().Format("15:04:05"), text)
 
+							// Переименовываем файл, добавляя распознанный текст
+							timestamp := time.Now().Unix()
+							newFilename := fmt.Sprintf(".voices/%s_%s.wav", timestamp, text)
+							if renameErr := os.Rename(currentFilename, newFilename); renameErr != nil {
+								fmt.Printf("⚠️ Не удалось переименовать файл: %v\n", renameErr)
+							}
+
 							// Копируем в буфер обмена и вставляем в позицию курсора
 							if copyErr := copyToClipboardAndPaste(text); copyErr != nil {
 								fmt.Printf("❌ Ошибка копирования/вставки: %v\n", copyErr)
@@ -361,7 +367,7 @@ loop:
 			if ev.Kind == hook.MouseDown && ev.Button == 2 {
 				middleButtonPressed = true
 				middleButtonRecordingStarted = false
-				middleButtonPressTime = time.Now()
+				//middleButtonPressTime = time.Now()
 			}
 
 			// Отслеживаем отпускание средней кнопки мыши (Button 2)
@@ -378,6 +384,13 @@ loop:
 							fmt.Printf("❌ Ошибка распознавания: %v\n", err)
 						} else {
 							fmt.Printf("[%s] 📝 %s\n", time.Now().Format("15:04:05"), text)
+
+							// Переименовываем файл, добавляя распознанный текст
+							timestamp := time.Now().Format("2006-01-02_15-04-05")
+							newFilename := fmt.Sprintf(".voices/%s_%s.wav", timestamp, text)
+							if renameErr := os.Rename(currentFilename, newFilename); renameErr != nil {
+								fmt.Printf("⚠️ Не удалось переименовать файл: %v\n", renameErr)
+							}
 
 							// Копируем в буфер обмена и вставляем в позицию курсора
 							if copyErr := copyToClipboardAndPaste(text); copyErr != nil {
