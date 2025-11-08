@@ -1,0 +1,2 @@
+$env:Path += ";C:\Program Files\nodejs"
+node --version
