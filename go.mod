@@ -1,10 +1,11 @@
-module keywatch
+module recognize
 
 go 1.24.6
 
 require (
 	github.com/go-vgo/robotgo v0.110.8
 	github.com/gordonklaus/portaudio v0.0.0-20250206071425-98a94950218b
+	github.com/joho/godotenv v1.5.1
 	github.com/robotn/gohook v0.42.2
 )
 
@@ -15,7 +16,6 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20250317134145-8bc96cf8fc35 // indirect
 	github.com/otiai10/gosseract v2.2.1+incompatible // indirect
 	github.com/otiai10/mint v1.6.3 // indirect

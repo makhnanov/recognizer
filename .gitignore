@@ -3,3 +3,5 @@
 test
 keywatch
 .env
+/test.txt
+/recognize

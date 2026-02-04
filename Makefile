@@ -1,14 +1,20 @@
-.PHONY: run build clean install
+.PHONY: run build clean install help
 
-run:
-	go run recognize.go
+help: ## Show this help message
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Targets:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
 
-build:
+run: ## Build and run the application
+	make install && go build -o recognize recognize.go && ./recognize
+
+build: ## Compile the binary
 	go build -o recognize recognize.go
 
-install:
+install: ## Install dependencies (go mod tidy)
 	go mod tidy
 
-clean:
+clean: ## Remove binary and recorded audio files
 	rm -f recognize
 	rm -rf .voices/*.wav

@@ -1,9 +1,15 @@
 {
   "permissions": {
-    "allow": [],
-    "deny": [
-      "Bash(go:*)"
+    "allow": [
+      "Bash(make:*)",
+      "Bash(sed -i:*)",
+      "Bash(go build:*)",
+      "Bash(tree:*)",
+      "Bash(git -C /var/www/recognize log --oneline -10)",
+      "Bash(git -C /var/www/recognize status)",
+      "Bash(git -C /var/www/recognize diff --stat)"
     ],
+    "deny": [],
     "ask": []
   }
 }
