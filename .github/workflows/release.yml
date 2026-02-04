@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libportaudio2 portaudio19-dev libx11-dev libx11-xcb-dev libxtst-dev libxinerama-dev libxcursor-dev libxkbcommon-dev
+          sudo apt-get install -y libportaudio2 portaudio19-dev libx11-dev libx11-xcb-dev libxtst-dev libxinerama-dev libxcursor-dev libxkbcommon-dev libxkbcommon-x11-dev
 
       - name: Build
         run: |
