@@ -1,13 +1,13 @@
 .PHONY: run build clean install help
 
+run: ## Build and run the application
+	make install && go build -o recognize recognize.go && ./recognize
+
 help: ## Show this help message
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Targets:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
-
-run: ## Build and run the application
-	make install && go build -o recognize recognize.go && ./recognize
 
 build: ## Compile the binary
 	go build -o recognize recognize.go
