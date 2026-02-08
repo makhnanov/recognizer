@@ -1,6 +1,6 @@
 ![vibe](https://img.shields.io/badge/vibe-clauded-da6a46)
 
-# Recognize
+# Recognizer
 
 **Linux үшін дауыстан мәтінге енгізу құралы** — пернені басып тұрыңыз, сөйлеңіз, жіберіңіз — мәтін курсор орнында пайда болады.
 
@@ -61,13 +61,13 @@ make
 Немесе қолмен:
 
 ```bash
-go build -o recognize recognize.go
+go build -o recognizer recognizer.go
 ```
 
 ## Қолдану
 
 ```bash
-./recognize
+./recognizer
 ```
 
 - **F9 басып тұру** — жазуды бастау (дыбыстық сигнал)
@@ -85,7 +85,7 @@ go build -o recognize recognize.go
 `~/.bashrc` немесе `~/.zshrc` файлына қосыңыз:
 
 ```bash
-alias rec='/жол/recognize'
+alias rec='/жол/recognizer'
 ```
 
 ## Бұл қалай жұмыс істейді

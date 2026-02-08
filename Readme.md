@@ -1,6 +1,6 @@
 ![vibe](https://img.shields.io/badge/vibe-clauded-da6a46)
 
-# Recognize
+# Recognizer
 
 **Voice-to-text input tool for Linux** — hold a key, speak, release, and your words appear at the cursor.
 
@@ -61,13 +61,13 @@ make
 Or manually:
 
 ```bash
-go build -o recognize recognize.go
+go build -o recognizer recognizer.go
 ```
 
 ## Usage
 
 ```bash
-./recognize
+./recognizer
 ```
 
 - **Hold F9** — start recording (beep sound)
@@ -85,7 +85,7 @@ Example: Copy some code, then say "Исправь вот это" → pastes "И�
 Add to your `~/.bashrc` or `~/.zshrc`:
 
 ```bash
-alias rec='/path/to/recognize'
+alias rec='/path/to/recognizer'
 ```
 
 ## How It Works

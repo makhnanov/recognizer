@@ -1,6 +1,6 @@
 ![vibe](https://img.shields.io/badge/vibe-clauded-da6a46)
 
-# Recognize
+# Recognizer
 
 **Linux用音声テキスト入力ツール** — キーを押しながら話し、離すとカーソル位置にテキストが表示されます。
 
@@ -61,13 +61,13 @@ make
 または手動で:
 
 ```bash
-go build -o recognize recognize.go
+go build -o recognizer recognizer.go
 ```
 
 ## 使用方法
 
 ```bash
-./recognize
+./recognizer
 ```
 
 - **F9を押す** — 録音開始（ビープ音）
@@ -85,7 +85,7 @@ go build -o recognize recognize.go
 `~/.bashrc`または`~/.zshrc`に追加:
 
 ```bash
-alias rec='/path/to/recognize'
+alias rec='/path/to/recognizer'
 ```
 
 ## 仕組み

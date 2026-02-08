@@ -1,6 +1,6 @@
 ![vibe](https://img.shields.io/badge/vibe-clauded-da6a46)
 
-# Recognize
+# Recognizer
 
 **أداة إدخال الصوت إلى نص لنظام Linux** — اضغط مع الاستمرار على مفتاح، تحدث، أفلت، وستظهر كلماتك عند موضع المؤشر.
 
@@ -61,13 +61,13 @@ make
 أو يدوياً:
 
 ```bash
-go build -o recognize recognize.go
+go build -o recognizer recognizer.go
 ```
 
 ## الاستخدام
 
 ```bash
-./recognize
+./recognizer
 ```
 
 - **اضغط مع الاستمرار على F9** — بدء التسجيل (صوت تنبيه)
@@ -85,7 +85,7 @@ go build -o recognize recognize.go
 أضف إلى `~/.bashrc` أو `~/.zshrc`:
 
 ```bash
-alias rec='/path/to/recognize'
+alias rec='/path/to/recognizer'
 ```
 
 ## كيف يعمل

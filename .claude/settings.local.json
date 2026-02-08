@@ -5,9 +5,9 @@
       "Bash(sed -i:*)",
       "Bash(go build:*)",
       "Bash(tree:*)",
-      "Bash(git -C /var/www/recognize log --oneline -10)",
-      "Bash(git -C /var/www/recognize status)",
-      "Bash(git -C /var/www/recognize diff --stat)"
+      "Bash(git -C /var/www/recognizer log --oneline -10)",
+      "Bash(git -C /var/www/recognizer status)",
+      "Bash(git -C /var/www/recognizer diff --stat)"
     ],
     "deny": [],
     "ask": []

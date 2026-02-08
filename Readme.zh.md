@@ -1,6 +1,6 @@
 ![vibe](https://img.shields.io/badge/vibe-clauded-da6a46)
 
-# Recognize
+# Recognizer
 
 **Linux语音转文字输入工具** — 按住按键，说话，松开，文字就会出现在光标位置。
 
@@ -61,13 +61,13 @@ make
 或手动构建：
 
 ```bash
-go build -o recognize recognize.go
+go build -o recognizer recognizer.go
 ```
 
 ## 使用方法
 
 ```bash
-./recognize
+./recognizer
 ```
 
 - **按住F9** — 开始录音（提示音）
@@ -85,7 +85,7 @@ go build -o recognize recognize.go
 添加到`~/.bashrc`或`~/.zshrc`：
 
 ```bash
-alias rec='/path/to/recognize'
+alias rec='/path/to/recognizer'
 ```
 
 ## 工作原理

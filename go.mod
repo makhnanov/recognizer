@@ -1,4 +1,4 @@
-module recognize
+module recognizer
 
 go 1.24.6
 

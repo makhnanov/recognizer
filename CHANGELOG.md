@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - Extracted magic numbers into named constants for better maintainability
-- Renamed Go module from `keywatch` to `recognize`
+- Renamed Go module from `keywatch` to `recognizer`
 
 ## [1.0.0] - 2024
 

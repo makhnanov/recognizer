@@ -1,6 +1,6 @@
 ![vibe](https://img.shields.io/badge/vibe-clauded-da6a46)
 
-# Recognize
+# Recognizer
 
 **Голосове введення тексту для Linux** — затисніть клавішу, говоріть, відпустіть — і текст з'явиться в позиції курсора.
 
@@ -61,13 +61,13 @@ make
 Або вручну:
 
 ```bash
-go build -o recognize recognize.go
+go build -o recognizer recognizer.go
 ```
 
 ## Використання
 
 ```bash
-./recognize
+./recognizer
 ```
 
 - **Затиснути F9** — почати запис (звуковий сигнал)
@@ -85,7 +85,7 @@ go build -o recognize recognize.go
 Додайте до `~/.bashrc` або `~/.zshrc`:
 
 ```bash
-alias rec='/шлях/до/recognize'
+alias rec='/шлях/до/recognizer'
 ```
 
 ## Як це працює
