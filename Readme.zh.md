@@ -4,7 +4,7 @@
 
 **Linux语音转文字输入工具** — 按住按键，说话，松开，文字就会出现在光标位置。
 
-[Русский](Readme.ru.md) | [English](Readme.md) | [Қазақша](Readme.kk.md) | [Українська](Readme.uk.md) | [日本語](Readme.ja.md) | [中文](Readme.zh.md) | [العربية](Readme.ar.md)
+[Русский](Readme.ru.md) | [English](Readme.md) | [Қазақша](Readme.kk.md) | [Українська](Readme.uk.md) | [日本語](Readme.ja.md) | [العربية](Readme.ar.md)
 
 ## 功能特点
 

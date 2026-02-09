@@ -4,7 +4,7 @@
 
 **Голосовой ввод текста для Linux** — зажми клавишу, говори, отпусти — и текст появится в позиции курсора.
 
-[Русский](Readme.ru.md) | [English](Readme.md) | [Қазақша](Readme.kk.md) | [Українська](Readme.uk.md) | [日本語](Readme.ja.md) | [中文](Readme.zh.md) | [العربية](Readme.ar.md)
+[English](Readme.md) | [Қазақша](Readme.kk.md) | [Українська](Readme.uk.md) | [日本語](Readme.ja.md) | [中文](Readme.zh.md) | [العربية](Readme.ar.md)
 
 ## Возможности
 

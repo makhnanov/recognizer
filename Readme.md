@@ -4,7 +4,7 @@
 
 **Voice-to-text input tool for Linux** — hold a key, speak, release, and your words appear at the cursor.
 
-[Русский](Readme.ru.md) | [English](Readme.md) | [Қазақша](Readme.kk.md) | [Українська](Readme.uk.md) | [日本語](Readme.ja.md) | [中文](Readme.zh.md) | [العربية](Readme.ar.md)
+[Русский](Readme.ru.md) | [Қазақша](Readme.kk.md) | [Українська](Readme.uk.md) | [日本語](Readme.ja.md) | [中文](Readme.zh.md) | [العربية](Readme.ar.md)
 
 ## Features
 

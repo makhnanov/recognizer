@@ -4,7 +4,7 @@
 
 **Linux用音声テキスト入力ツール** — キーを押しながら話し、離すとカーソル位置にテキストが表示されます。
 
-[Русский](Readme.ru.md) | [English](Readme.md) | [Қазақша](Readme.kk.md) | [Українська](Readme.uk.md) | [日本語](Readme.ja.md) | [中文](Readme.zh.md) | [العربية](Readme.ar.md)
+[Русский](Readme.ru.md) | [English](Readme.md) | [Қазақша](Readme.kk.md) | [Українська](Readme.uk.md) | [中文](Readme.zh.md) | [العربية](Readme.ar.md)
 
 ## 機能
 

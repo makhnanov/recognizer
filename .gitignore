@@ -5,4 +5,5 @@ keywatch
 .env
 /test.txt
 recognizer
+recognizer.log
 recognize

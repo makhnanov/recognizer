@@ -38,6 +38,7 @@ const (
 
 var (
 	OPENAI_API_KEY   string
+	WHISPER_MODEL    string
 	WHISPER_LANGUAGE string
 )
 
@@ -238,7 +239,7 @@ func transcribeAudio(filename string) (string, error) {
 		return "", fmt.Errorf("failed to copy file data: %v", err)
 	}
 
-	writer.WriteField("model", "whisper-1")
+	writer.WriteField("model", WHISPER_MODEL)
 	if WHISPER_LANGUAGE != "" {
 		writer.WriteField("language", WHISPER_LANGUAGE)
 	}
@@ -312,6 +313,11 @@ func main() {
 		log.Fatal("OPENAI_API_KEY not set")
 	}
 
+	WHISPER_MODEL = os.Getenv("WHISPER_MODEL")
+	if WHISPER_MODEL == "" {
+		WHISPER_MODEL = "gpt-4o-transcribe"
+	}
+
 	WHISPER_LANGUAGE = os.Getenv("WHISPER_LANGUAGE")
 
 	portaudio.Initialize()
@@ -331,17 +337,9 @@ func main() {
 	evChan := hook.Start()
 	defer hook.End()
 
-	fmt.Println("Hold F9 to record, release to stop and transcribe.")
+	phrasesFile := filepath.Join(execDir, "phrases.txt")
 
-	// Phrases that trigger clipboard substitution (longer variants first)
-	phrases := []string{
-		"вот это вот", "вот эта вот", "вот этот вот", "вот эти вот",
-		"вот такое вот", "вот такая вот", "вот такой вот", "вот такие вот",
-		"вот сюда вот", "вот здесь вот", "вот тут вот",
-		"вот это", "вот эта", "вот этот", "вот эти",
-		"вот такое", "вот такая", "вот такой", "вот такие", "вот этого", "вот этово", "вот этих", "вот этой",
-		"вот сюда", "вот здесь", "вот тут",
-	}
+	fmt.Println("Hold F9 to record, release to stop and transcribe.")
 
 loop:
 	for {
@@ -377,7 +375,12 @@ loop:
 				}
 
 				// Replace pointer phrases with clipboard content
-				textToInsert = replacePointerPhrases(textToInsert, phrases)
+				phrases, err := loadPhrases(phrasesFile)
+				if err != nil {
+					log.Printf("load phrases error: %v", err)
+				} else {
+					textToInsert = replacePointerPhrases(textToInsert, phrases)
+				}
 
 				copyToClipboardAndPaste(textToInsert)
 			}
@@ -385,6 +388,22 @@ loop:
 			break loop
 		}
 	}
+}
+
+// loadPhrases reads pointer phrases from a text file (one phrase per line)
+func loadPhrases(filename string) ([]string, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	var phrases []string
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if line != "" && !strings.HasPrefix(line, "#") {
+			phrases = append(phrases, line)
+		}
+	}
+	return phrases, nil
 }
 
 // replacePointerPhrases replaces Russian pointer phrases with clipboard content
