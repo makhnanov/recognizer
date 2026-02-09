@@ -11,6 +11,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"strings"
@@ -277,6 +278,53 @@ func transcribeAudio(filename string) (string, error) {
 	return strings.TrimSpace(whisperResp.Text), nil
 }
 
+// getActiveWindowClass returns WM_CLASS of the currently focused window
+func getActiveWindowClass() string {
+	out, err := exec.Command("xprop", "-root", "_NET_ACTIVE_WINDOW").Output()
+	if err != nil {
+		log.Printf("xprop root failed: %v", err)
+		return ""
+	}
+	log.Printf("xprop root: %s", strings.TrimSpace(string(out)))
+
+	// Parse: _NET_ACTIVE_WINDOW(WINDOW): window id # 0xa800003, 0x0
+	raw := string(out)
+	idx := strings.Index(raw, "# ")
+	if idx == -1 {
+		log.Print("xprop: no window id found")
+		return ""
+	}
+	rest := strings.TrimSpace(raw[idx+2:])
+	windowID := strings.TrimRight(strings.Fields(rest)[0], ",")
+	log.Printf("active window ID: %s", windowID)
+
+	out, err = exec.Command("xprop", "-id", windowID, "WM_CLASS").Output()
+	if err != nil {
+		log.Printf("xprop WM_CLASS failed: %v", err)
+		return ""
+	}
+
+	wmClass := strings.TrimSpace(string(out))
+	log.Printf("WM_CLASS: %s", wmClass)
+	return wmClass
+}
+
+// isTerminalWindow checks if WM_CLASS belongs to a terminal emulator
+func isTerminalWindow(wmClass string) bool {
+	lower := strings.ToLower(wmClass)
+	terminals := []string{
+		"terminal", "konsole", "alacritty", "kitty", "tilix",
+		"terminator", "guake", "yakuake", "urxvt", "rxvt",
+		"xterm", "wezterm", "sakura", "terminology", "st-256color",
+	}
+	for _, t := range terminals {
+		if strings.Contains(lower, t) {
+			return true
+		}
+	}
+	return false
+}
+
 // copyToClipboardAndPaste copies text to clipboard, pastes it, and restores previous clipboard content
 func copyToClipboardAndPaste(text string) error {
 	if text == "" {
@@ -288,7 +336,14 @@ func copyToClipboardAndPaste(text string) error {
 	robotgo.WriteAll(text)
 	time.Sleep(100 * time.Millisecond)
 
-	robotgo.KeyTap("v", "ctrl")
+	wmClass := getActiveWindowClass()
+	if isTerminalWindow(wmClass) {
+		log.Print("terminal detected, using ctrl+shift+v")
+		robotgo.KeyTap("v", "ctrl", "shift")
+	} else {
+		log.Print("non-terminal window, using ctrl+v")
+		robotgo.KeyTap("v", "ctrl")
+	}
 
 	time.Sleep(200 * time.Millisecond)
 
