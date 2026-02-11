@@ -10,9 +10,12 @@
 
 - **Push-to-talk recording** — hold F9 to record, release to transcribe
 - **Instant text insertion** — transcribed text is automatically pasted at cursor position
+- **Smart paste** — automatically uses Ctrl+Shift+V in terminal emulators, Ctrl+V elsewhere
 - **Clipboard preservation** — your clipboard content is saved and restored after paste
 - **Audio feedback** — xylophone beep on start/stop recording
-- **Pointer phrase substitution** — say "вот это" (this one) to insert clipboard content inline
+- **Pointer phrase substitution** — say "this thing" or "вот это" to insert clipboard content inline
+- **Multi-language phrases** — pointer phrases supported in Russian, English, Ukrainian, Kazakh, Japanese, Chinese, and Arabic
+- **Configurable transcription model** — choose any OpenAI transcription model via `.env`
 
 ## Requirements
 
@@ -46,11 +49,17 @@ cp .env.example .env
 
 ### 3. Configure
 
-Edit `.env` and add your OpenAI API key:
+Edit `.env` and set your parameters:
 
 ```
 OPENAI_API_KEY=sk-...
+WHISPER_MODEL=gpt-4o-transcribe
+WHISPER_LANGUAGE=ru
 ```
+
+- `OPENAI_API_KEY` — your OpenAI API key (required)
+- `WHISPER_MODEL` — transcription model (default: `gpt-4o-transcribe`)
+- `WHISPER_LANGUAGE` — language hint in ISO-639-1 format (optional, e.g. `ru`, `en`)
 
 ### 4. Build
 
@@ -76,9 +85,29 @@ go build -o recognizer recognizer.go
 
 ### Pointer Phrases
 
-When you say phrases like "вот это", "вот эта", "вот сюда" etc., they will be replaced with your current clipboard content. This allows you to reference copied text in your dictation.
+Pointer phrases are loaded from the `phrases.txt` file (one phrase per line, `#` lines are comments). The file is re-read on every transcription, so you can edit it without restarting the program.
 
-Example: Copy some code, then say "Исправь вот это" → pastes "Исправь [your clipboard content]"
+Multi-language phrases are included out of the box: Russian, English, Ukrainian, Kazakh, Japanese, Chinese, and Arabic.
+
+Example: Copy some code, then say "Fix this thing" → pastes "Fix [your clipboard content]"
+
+## Autostart
+
+To start Recognizer automatically on login, copy the desktop entry:
+
+```bash
+cp scripts/recognizer.desktop $HOME/.config/scripts/
+```
+
+## Rebuild and Restart
+
+To stop the running instance, rebuild, and launch in the background:
+
+```bash
+./scripts/restart.sh
+```
+
+The script finds and stops the running process, builds a fresh binary, and starts it detached from the terminal. Output is logged to `recognizer.log`.
 
 ## Shell Aliases
 
@@ -92,9 +121,9 @@ alias rec='/path/to/recognizer'
 
 1. Listens for F9 key events via system hooks
 2. Records audio from default microphone to WAV file
-3. Sends audio to OpenAI Whisper API for transcription
-4. Processes text (removes trailing ellipsis, substitutes pointer phrases)
-5. Pastes result via Ctrl+V, preserving original clipboard
+3. Sends audio to OpenAI transcription API (configurable model)
+4. Processes text (removes trailing ellipsis, substitutes pointer phrases from `phrases.txt`)
+5. Detects active window type and pastes result via Ctrl+Shift+V (terminals) or Ctrl+V (other apps), preserving original clipboard
 
 ## License
 
