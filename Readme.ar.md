@@ -96,7 +96,7 @@ go build -o recognizer recognizer.go
 لتشغيل Recognizer تلقائياً عند تسجيل الدخول، انسخ ملف إدخال سطح المكتب:
 
 ```bash
-cp scripts/recognizer.desktop $HOME/.config/scripts/
+cp scripts/recognizer.desktop $HOME/.config/autostart/ # If executor in /var/www/recognizer/recognizer
 ```
 
 ## إعادة البناء وإعادة التشغيل

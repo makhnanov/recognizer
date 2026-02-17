@@ -96,7 +96,7 @@ Example: Copy some code, then say "Fix this thing" → pastes "Fix [your clipboa
 To start Recognizer automatically on login, copy the desktop entry:
 
 ```bash
-cp scripts/recognizer.desktop $HOME/.config/scripts/
+cp scripts/recognizer.desktop $HOME/.config/autostart/ # If executor in /var/www/recognizer/recognizer
 ```
 
 ## Rebuild and Restart

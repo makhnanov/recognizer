@@ -96,7 +96,7 @@ go build -o recognizer recognizer.go
 Recognizer жүйеге кірген кезде автоматты түрде іске қосылуы үшін жұмыс үстелі файлын көшіріңіз:
 
 ```bash
-cp scripts/recognizer.desktop $HOME/.config/scripts/
+cp scripts/recognizer.desktop $HOME/.config/autostart/ # If executor in /var/www/recognizer/recognizer
 ```
 
 ## Қайта құрастыру және қайта іске қосу

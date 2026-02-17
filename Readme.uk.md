@@ -96,7 +96,7 @@ go build -o recognizer recognizer.go
 Щоб Recognizer запускався автоматично при вході в систему, скопіюйте файл автозавантаження:
 
 ```bash
-cp scripts/recognizer.desktop $HOME/.config/scripts/
+cp scripts/recognizer.desktop $HOME/.config/autostart/ # If executor in /var/www/recognizer/recognizer
 ```
 
 ## Перезбірка та перезапуск

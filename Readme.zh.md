@@ -96,7 +96,7 @@ go build -o recognizer recognizer.go
 要在登录时自动启动Recognizer，复制桌面入口文件：
 
 ```bash
-cp scripts/recognizer.desktop $HOME/.config/scripts/
+cp scripts/recognizer.desktop $HOME/.config/autostart/ # If executor in /var/www/recognizer/recognizer
 ```
 
 ## 重新构建和重启

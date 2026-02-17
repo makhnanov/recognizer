@@ -96,7 +96,7 @@ go build -o recognizer recognizer.go
 ログイン時にRecognizerを自動起動するには、デスクトップエントリをコピー:
 
 ```bash
-cp scripts/recognizer.desktop $HOME/.config/scripts/
+cp scripts/recognizer.desktop $HOME/.config/autostart/ # If executor in /var/www/recognizer/recognizer
 ```
 
 ## リビルドと再起動
