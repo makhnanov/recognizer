@@ -15,6 +15,7 @@
 - **Audio feedback** — xylophone beep on start/stop recording
 - **Pointer phrase substitution** — say "this thing" or "вот это" to insert clipboard content inline
 - **Multi-language phrases** — pointer phrases supported in Russian, English, Ukrainian, Kazakh, Japanese, Chinese, and Arabic
+- **Negativity filter** — automatically rewrites rude or offensive speech in a polite way (configurable threshold)
 - **Configurable transcription model** — choose any OpenAI transcription model via `.env`
 
 ## Requirements
@@ -55,11 +56,15 @@ Edit `.env` and set your parameters:
 OPENAI_API_KEY=sk-...
 WHISPER_MODEL=gpt-4o-transcribe
 WHISPER_LANGUAGE=ru
+FILTER_MODEL=gpt-4o-mini
+NEGATIVITY_THRESHOLD=50
 ```
 
 - `OPENAI_API_KEY` — your OpenAI API key (required)
 - `WHISPER_MODEL` — transcription model (default: `gpt-4o-transcribe`)
 - `WHISPER_LANGUAGE` — language hint in ISO-639-1 format (optional, e.g. `ru`, `en`)
+- `FILTER_MODEL` — model for negativity analysis (default: `gpt-4o-mini`)
+- `NEGATIVITY_THRESHOLD` — negativity percentage threshold for rewriting (default: `50`, set to `0` to disable)
 
 ### 4. Build
 
@@ -123,7 +128,8 @@ alias rec='/path/to/recognizer'
 2. Records audio from default microphone to WAV file
 3. Sends audio to OpenAI transcription API (configurable model)
 4. Processes text (removes trailing ellipsis, substitutes pointer phrases from `phrases.txt`)
-5. Detects active window type and pastes result via Ctrl+Shift+V (terminals) or Ctrl+V (other apps), preserving original clipboard
+5. Analyzes text negativity — if it exceeds the threshold, rewrites it politely
+6. Detects active window type and pastes result via Ctrl+Shift+V (terminals) or Ctrl+V (other apps), preserving original clipboard
 
 ## License
 

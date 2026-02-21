@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -38,13 +39,44 @@ const (
 )
 
 var (
-	OPENAI_API_KEY   string
-	WHISPER_MODEL    string
-	WHISPER_LANGUAGE string
+	OPENAI_API_KEY       string
+	WHISPER_MODEL        string
+	WHISPER_LANGUAGE     string
+	FILTER_MODEL         string
+	NEGATIVITY_THRESHOLD int
 )
 
 type WhisperResponse struct {
 	Text string `json:"text"`
+}
+
+type ChatMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+type ChatRequest struct {
+	Model          string          `json:"model"`
+	Messages       []ChatMessage   `json:"messages"`
+	Temperature    float64         `json:"temperature"`
+	ResponseFormat *ResponseFormat `json:"response_format,omitempty"`
+}
+
+type ResponseFormat struct {
+	Type string `json:"type"`
+}
+
+type ChatChoice struct {
+	Message ChatMessage `json:"message"`
+}
+
+type ChatResponse struct {
+	Choices []ChatChoice `json:"choices"`
+}
+
+type NegativityResult struct {
+	NegativityPercent int    `json:"negativity_percent"`
+	RewrittenText     string `json:"rewritten_text"`
 }
 
 type AudioRecorder struct {
@@ -278,6 +310,79 @@ func transcribeAudio(filename string) (string, error) {
 	return strings.TrimSpace(whisperResp.Text), nil
 }
 
+// filterNegativity analyzes text negativity via OpenAI Chat API.
+// If negativity exceeds NEGATIVITY_THRESHOLD, returns a polite rewritten version.
+func filterNegativity(text string) (string, error) {
+	systemPrompt := `You are a text analysis assistant. Analyze the negativity level of the given text. ` +
+		`Rate it from 0 to 100 where 0 is completely positive/neutral and 100 is extremely negative/rude/offensive. ` +
+		`Always rewrite the text in a polite, politically correct way while preserving the original meaning and language. ` +
+		`Respond with JSON: {"negativity_percent": <0-100>, "rewritten_text": "<polite version of the text in the same language>"}`
+
+	reqBody := ChatRequest{
+		Model: FILTER_MODEL,
+		Messages: []ChatMessage{
+			{Role: "system", Content: systemPrompt},
+			{Role: "user", Content: text},
+		},
+		Temperature:    0.3,
+		ResponseFormat: &ResponseFormat{Type: "json_object"},
+	}
+
+	jsonData, err := json.Marshal(reqBody)
+	if err != nil {
+		return text, fmt.Errorf("failed to marshal request: %v", err)
+	}
+
+	req, err := http.NewRequest("POST", "https://api.openai.com/v1/chat/completions", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return text, fmt.Errorf("failed to create request: %v", err)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+OPENAI_API_KEY)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{Timeout: APITimeout}
+	resp, err := client.Do(req)
+	if err != nil {
+		return text, fmt.Errorf("failed to send request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return text, fmt.Errorf("failed to read response: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return text, fmt.Errorf("API error (status %d): %s", resp.StatusCode, string(body))
+	}
+
+	var chatResp ChatResponse
+	if err = json.Unmarshal(body, &chatResp); err != nil {
+		return text, fmt.Errorf("failed to parse response: %v", err)
+	}
+
+	if len(chatResp.Choices) == 0 {
+		return text, fmt.Errorf("no choices in response")
+	}
+
+	content := strings.TrimSpace(chatResp.Choices[0].Message.Content)
+
+	var result NegativityResult
+	if err = json.Unmarshal([]byte(content), &result); err != nil {
+		return text, fmt.Errorf("failed to parse negativity result: %v (content: %s)", err, content)
+	}
+
+	log.Printf("negativity: %d%% (threshold: %d%%)", result.NegativityPercent, NEGATIVITY_THRESHOLD)
+
+	if result.NegativityPercent > NEGATIVITY_THRESHOLD {
+		log.Printf("text rewritten from [%s] to [%s]", text, result.RewrittenText)
+		return result.RewrittenText, nil
+	}
+
+	return text, nil
+}
+
 // getActiveWindowClass returns WM_CLASS of the currently focused window
 func getActiveWindowClass() string {
 	out, err := exec.Command("xprop", "-root", "_NET_ACTIVE_WINDOW").Output()
@@ -375,6 +480,18 @@ func main() {
 
 	WHISPER_LANGUAGE = os.Getenv("WHISPER_LANGUAGE")
 
+	FILTER_MODEL = os.Getenv("FILTER_MODEL")
+	if FILTER_MODEL == "" {
+		FILTER_MODEL = "gpt-4o-mini"
+	}
+
+	NEGATIVITY_THRESHOLD = 50
+	if v := os.Getenv("NEGATIVITY_THRESHOLD"); v != "" {
+		if parsed, err := strconv.Atoi(v); err == nil {
+			NEGATIVITY_THRESHOLD = parsed
+		}
+	}
+
 	portaudio.Initialize()
 	defer portaudio.Terminate()
 
@@ -435,6 +552,16 @@ loop:
 					log.Printf("load phrases error: %v", err)
 				} else {
 					textToInsert = replacePointerPhrases(textToInsert, phrases)
+				}
+
+				// Filter negativity — rewrite if too negative
+				if NEGATIVITY_THRESHOLD > 0 {
+					filteredText, filterErr := filterNegativity(textToInsert)
+					if filterErr != nil {
+						log.Printf("negativity filter error: %v", filterErr)
+					} else {
+						textToInsert = filteredText
+					}
 				}
 
 				copyToClipboardAndPaste(textToInsert)

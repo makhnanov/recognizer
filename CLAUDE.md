@@ -19,6 +19,8 @@ Recognizer is a Linux voice-to-text input tool written in Go. Hold F9, speak, re
 The app loads `.env` from the executable's directory (not CWD). Required variables:
 - `OPENAI_API_KEY` — OpenAI API key (required)
 - `WHISPER_LANGUAGE` — language hint for Whisper (optional, e.g. `ru`)
+- `FILTER_MODEL` — model for negativity analysis (default: `gpt-4o-mini`)
+- `NEGATIVITY_THRESHOLD` — negativity % threshold for polite rewriting (default: `50`, `0` to disable)
 
 Copy `.env.example` to `.env` to get started.
 
@@ -35,6 +37,7 @@ Single-file Go application (`recognizer.go`) with no internal packages. All logi
 
 - **AudioRecorder struct** — manages PortAudio stream, writes PCM data to WAV files in `.voices/` directory. Uses goroutine with stop/done channels for recording loop.
 - **transcribeAudio()** — sends WAV file to OpenAI Whisper API via multipart POST, returns transcribed text.
+- **filterNegativity()** — sends text to OpenAI Chat API, rates negativity 0–100. If above threshold, returns polite rewritten version.
 - **copyToClipboardAndPaste()** — saves current clipboard, writes text to clipboard, simulates Ctrl+V, then restores original clipboard.
 - **replacePointerPhrases()** — substitutes Russian pointer phrases ("вот это", etc.) with current clipboard content. Checks case-insensitive, replaces in original/capitalized/uppercase forms.
 - **playBeep()** — generates a synthesized xylophone sound (C6 note with harmonics and exponential decay) via PortAudio.

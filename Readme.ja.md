@@ -15,6 +15,7 @@
 - **音声フィードバック** — 録音開始/終了時にシロフォン音
 - **ポインターフレーズ置換** — 「これ」と言うとクリップボードの内容が挿入されます
 - **多言語フレーズ** — ロシア語、英語、ウクライナ語、カザフ語、日本語、中国語、アラビア語対応
+- **ネガティブフィルター** — 失礼な発言や攻撃的な発言を自動的に丁寧に書き換え（しきい値設定可能）
 - **設定可能なモデル** — `.env`で任意のOpenAI文字起こしモデルを選択
 
 ## 要件
@@ -55,11 +56,15 @@ cp .env.example .env
 OPENAI_API_KEY=sk-...
 WHISPER_MODEL=gpt-4o-transcribe
 WHISPER_LANGUAGE=ja
+FILTER_MODEL=gpt-4o-mini
+NEGATIVITY_THRESHOLD=50
 ```
 
 - `OPENAI_API_KEY` — OpenAI APIキー（必須）
 - `WHISPER_MODEL` — 文字起こしモデル（デフォルト: `gpt-4o-transcribe`）
 - `WHISPER_LANGUAGE` — ISO-639-1形式の言語ヒント（任意、例: `ja`、`en`）
+- `FILTER_MODEL` — ネガティブ分析用モデル（デフォルト: `gpt-4o-mini`）
+- `NEGATIVITY_THRESHOLD` — 書き換えのネガティブ率しきい値（デフォルト: `50`、`0`で無効化）
 
 ### 4. ビルド
 
@@ -123,7 +128,8 @@ alias rec='/path/to/recognizer'
 2. デフォルトマイクロフォンからWAVファイルに音声を録音
 3. 音声をOpenAI文字起こしAPIに送信（設定可能なモデル）
 4. テキストを処理（末尾の省略記号を削除、`phrases.txt`からポインターフレーズを置換）
-5. アクティブウィンドウの種類を検出し、Ctrl+Shift+V（ターミナル）またはCtrl+V（その他）で結果を貼り付け、元のクリップボードを保持
+5. テキストのネガティブ度を分析 — しきい値を超えた場合、丁寧に書き換え
+6. アクティブウィンドウの種類を検出し、Ctrl+Shift+V（ターミナル）またはCtrl+V（その他）で結果を貼り付け、元のクリップボードを保持
 
 ## ライセンス
 

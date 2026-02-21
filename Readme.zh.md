@@ -15,6 +15,7 @@
 - **音频反馈** — 录音开始/结束时有木琴提示音
 - **指示短语替换** — 说"这个"可插入剪贴板内容
 - **多语言短语** — 支持俄语、英语、乌克兰语、哈萨克语、日语、中文和阿拉伯语
+- **负面过滤** — 自动将粗鲁或冒犯性的语言改写为礼貌表达（可配置阈值）
 - **可配置模型** — 通过`.env`选择任意OpenAI转录模型
 
 ## 系统要求
@@ -55,11 +56,15 @@ cp .env.example .env
 OPENAI_API_KEY=sk-...
 WHISPER_MODEL=gpt-4o-transcribe
 WHISPER_LANGUAGE=zh
+FILTER_MODEL=gpt-4o-mini
+NEGATIVITY_THRESHOLD=50
 ```
 
 - `OPENAI_API_KEY` — 您的OpenAI API密钥（必需）
 - `WHISPER_MODEL` — 转录模型（默认：`gpt-4o-transcribe`）
 - `WHISPER_LANGUAGE` — ISO-639-1格式的语言提示（可选，例如`zh`、`en`）
+- `FILTER_MODEL` — 负面分析模型（默认：`gpt-4o-mini`）
+- `NEGATIVITY_THRESHOLD` — 改写的负面百分比阈值（默认：`50`，`0`禁用）
 
 ### 4. 构建
 
@@ -123,7 +128,8 @@ alias rec='/path/to/recognizer'
 2. 从默认麦克风录制音频到WAV文件
 3. 将音频发送到OpenAI转录API（可配置模型）
 4. 处理文本（删除末尾省略号，替换`phrases.txt`中的指示短语）
-5. 检测活动窗口类型，通过Ctrl+Shift+V（终端）或Ctrl+V（其他应用）粘贴结果，保留原始剪贴板
+5. 分析文本负面程度 — 如果超过阈值，礼貌地改写
+6. 检测活动窗口类型，通过Ctrl+Shift+V（终端）或Ctrl+V（其他应用）粘贴结果，保留原始剪贴板
 
 ## 许可证
 
