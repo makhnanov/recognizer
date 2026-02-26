@@ -27,7 +27,12 @@ fi
 
 echo -e "Current version: ${GREEN}${LAST_TAG}${NC}\n"
 
-# Parse version
+# Parse version and detect prefix
+PREFIX=""
+if [[ $LAST_TAG =~ ^v ]]; then
+    PREFIX="v"
+fi
+
 if [[ $LAST_TAG =~ ^v?([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
     MAJOR="${BASH_REMATCH[1]}"
     MINOR="${BASH_REMATCH[2]}"
@@ -38,10 +43,10 @@ else
     exit 1
 fi
 
-# Calculate new versions
-NEW_MAJOR="$((MAJOR + 1)).0.0"
-NEW_MINOR="${MAJOR}.$((MINOR + 1)).0"
-NEW_PATCH="${MAJOR}.${MINOR}.$((PATCH + 1))"
+# Calculate new versions (preserving v prefix if present)
+NEW_MAJOR="${PREFIX}$((MAJOR + 1)).0.0"
+NEW_MINOR="${PREFIX}${MAJOR}.$((MINOR + 1)).0"
+NEW_PATCH="${PREFIX}${MAJOR}.${MINOR}.$((PATCH + 1))"
 
 # Get the last commit message
 LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
