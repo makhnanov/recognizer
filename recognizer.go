@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -588,7 +589,8 @@ func loadPhrases(filename string) ([]string, error) {
 	return phrases, nil
 }
 
-// replacePointerPhrases replaces Russian pointer phrases with clipboard content
+// replacePointerPhrases replaces Russian pointer phrases with clipboard content.
+// Phrases are sorted by length descending so longer matches are replaced first.
 func replacePointerPhrases(text string, phrases []string) string {
 	lowerText := strings.ToLower(text)
 	hasPhrase := false
@@ -607,7 +609,13 @@ func replacePointerPhrases(text string, phrases []string) string {
 		return text
 	}
 
-	for _, phrase := range phrases {
+	sorted := make([]string, len(phrases))
+	copy(sorted, phrases)
+	sort.Slice(sorted, func(i, j int) bool {
+		return len(sorted[i]) > len(sorted[j])
+	})
+
+	for _, phrase := range sorted {
 		text = strings.ReplaceAll(text, phrase, clipboardContent)
 		capitalized := strings.ToUpper(string([]rune(phrase)[0])) + string([]rune(phrase)[1:])
 		text = strings.ReplaceAll(text, capitalized, clipboardContent)

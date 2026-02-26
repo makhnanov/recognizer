@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+- Pointer phrase replacement now processes longer phrases first to avoid partial matches
+
 ### Added
 - Multilingual README support (English, Russian, Ukrainian, Kazakh, Japanese, Chinese, Arabic)
 - Configurable transcription language via `WHISPER_LANGUAGE` environment variable
